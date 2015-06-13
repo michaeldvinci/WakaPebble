@@ -46,7 +46,7 @@ var toHHMMSS = function (date) {
 var today = new Date();
 var today = [today.getMonth()+1,today.getDate(),today.getFullYear()].join('/');
 
-var api_key='c25785f1-43a8-41cd-8c4e-1b553b5c1047';
+var api_key='API KEY';
 
 ajax(
   { url: 'https://wakatime.com/api/v1/users/current/durations?date='+today+'&api_key='+api_key, type: 'json' }, 
