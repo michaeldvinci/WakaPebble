@@ -59,7 +59,7 @@ ajax(
 
 		console.log("data", data.data, data.data.length);
 
-		if (data.data.length = 0) {
+		if (data.data.length == 0) {
 			console.log("No data for date "+today);
 			items.push({
 				title: 'No time logged',
