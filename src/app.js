@@ -5,7 +5,6 @@ var itemsYes = [];
 var itemsTwo = [];
 var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var options = {};
-var api_key='';
 
 var toHHMMSS = function (date) {
 	var sec_num = parseInt(date, 10); // don't forget the second param
@@ -25,6 +24,8 @@ var today1 = [today.getMonth()+1,today.getDate(),today.getFullYear()].join('/');
 var yesterday = [today.getMonth()+1,today.getDate()-1,today.getFullYear()].join('/');
 var twoDaysAgo = [today.getMonth()+1,today.getDate()-2,today.getFullYear()].join('/');
 var twoDays = days[ today.getDay() -2];
+
+var api_key=localStorage.getItem(1);
 
 ajax(
 	{
@@ -124,7 +125,20 @@ ajax(
 
 		console.log("items", itemsTod);
 
-		checkAPI(api_key, itemsYes, itemsTod, itemsTwo) ;
+		var dailyProjects = new UI.Menu({
+   			sections: [{
+   				title: twoDays,
+   				items: itemsTwo
+   			}, {
+   				title: 'Yesterday',
+   				items: itemsYes
+   			}, {
+   				title: 'Today',
+               items: itemsTod
+   			}]
+   		});
+   
+   		dailyProjects.show();
 	},
 	function(error) {
 		// Failure!
@@ -145,9 +159,10 @@ Pebble.addEventListener("webviewclosed", function(e) {
   console.log('Configuration page returned: ' + JSON.stringify(configData));
 
   api_key = configData.API;
-
-  checkAPI(api_key, itemsYes, itemsTod, itemsTwo) ;
-
+   console.log("API Key", api_key);
+   localStorage.setItem(1, api_key);
+   console.log("localStorage 1", localStorage.getItem(1));
+   
   console.log("configuration closed");
   // webview closed
   //Using primitive JSON validity and non-empty check
@@ -158,22 +173,3 @@ Pebble.addEventListener("webviewclosed", function(e) {
     console.log("Cancelled");
   }
 });
-
-function checkAPI(api_key, twoitemsYes, itemsTod, itemsTwo) {
-   if (api_key !== '') {      
-      var dailyProjects = new UI.Menu({
-   			sections: [{
-   				title: twoDays,
-   				items: itemsTwo
-   			}, {
-   				title: 'Yesterday',
-   				items: itemsYes
-   			}, {
-   				title: 'Today',
-               items: itemsTod
-   			}]
-   		});
-   
-   		dailyProjects.show();
-   }
-}
