@@ -20,13 +20,21 @@
           <label for="name">API-Key:</label>
           <textarea cols="40" rows="8" name="name" id="name"></textarea>
         </div>
-      
+
+        <div class="ui-body ui-body-b">
+          <fieldset class="ui-grid-a">
+              <div class="ui-block-a"><button type="submit" data-theme="d" id="b-cancel">Cancel</button></div>
+              <div class="ui-block-b"><button type="submit" data-theme="a" id="b-submit">Submit</button></div>
+            </fieldset>
+          </div>
+        </div>
       </div>
-      
+    </div>
     <script>
       function saveOptions() {
         var options = {
           'name': $("#name").val(),
+          'special-feature': $("#special-feature").val()
         }
         return options;
       }
