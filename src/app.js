@@ -1,30 +1,11 @@
 var UI = require('ui');
-var Vector2 = require('vector2');
 var ajax = require('ajax');
 var itemsTod = [];
 var itemsYes = [];
 var itemsTwo = [];
 var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-var main = new UI.Card({
-	title: 'Pebble.js',
-	icon: 'images/menu_icon.png',
-	subtitle: 'Hello World!',
-	body: 'Press any button.'
-});
-
-function timeConverter(UNIX_timestamp){
-	var a = new Date(UNIX_timestamp*1000);
-	//var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-	//var year = a.getFullYear();
-	//var month = months[a.getMonth()];
-	//var date = a.getDate();
-	var hour = a.getHours();
-	var min = a.getMinutes();
-	var sec = a.getSeconds();
-	var time = hour + ':' + min + ':' + sec ;
-	return time;
-}
+var options = {};
+var api_key='';
 
 var toHHMMSS = function (date) {
 	var sec_num = parseInt(date, 10); // don't forget the second param
@@ -44,8 +25,6 @@ var today1 = [today.getMonth()+1,today.getDate(),today.getFullYear()].join('/');
 var yesterday = [today.getMonth()+1,today.getDate()-1,today.getFullYear()].join('/');
 var twoDaysAgo = [today.getMonth()+1,today.getDate()-2,today.getFullYear()].join('/');
 var twoDays = days[ today.getDay() -2];
-
-var api_key='4a70eed4-e615-4f98-97d4-db2bc3b8691b';
 
 ajax(
 	{
@@ -145,23 +124,56 @@ ajax(
 
 		console.log("items", itemsTod);
 
-		var dailyProjects = new UI.Menu({
-			sections: [{
-				title: twoDays,
-				items: itemsTwo
-			}, {
-				title: 'Yesterday',
-				items: itemsYes
-			}, {
-				title: 'Today',
-            items: itemsTod
-			}]
-		});
-
-		dailyProjects.show();
+		checkAPI(api_key, itemsYes, itemsTod, itemsTwo) ;
 	},
 	function(error) {
 		// Failure!
 		console.log('Failed fetching WakaTime data: ' + error);
 	}
 );
+
+Pebble.addEventListener('showConfiguration', function() {
+  var url = 'http://michaeldvinci.github.io/WakaPebble';
+
+  Pebble.openURL(url);
+});
+
+
+Pebble.addEventListener("webviewclosed", function(e) {
+
+  var configData = JSON.parse(decodeURIComponent(e.response));
+  console.log('Configuration page returned: ' + JSON.stringify(configData));
+
+  api_key = configData.API;
+
+  checkAPI(api_key, itemsYes, itemsTod, itemsTwo) ;
+
+  console.log("configuration closed");
+  // webview closed
+  //Using primitive JSON validity and non-empty check
+  if (e.response.charAt(0) == "{" && e.response.slice(-1) == "}" && e.response.length > 5) {
+    options = JSON.parse(decodeURIComponent(e.response));
+    console.log("Options = " + JSON.stringify(options));
+  } else {
+    console.log("Cancelled");
+  }
+});
+
+function checkAPI(api_key, twoitemsYes, itemsTod, itemsTwo) {
+   if (api_key !== '') {      
+      var dailyProjects = new UI.Menu({
+   			sections: [{
+   				title: twoDays,
+   				items: itemsTwo
+   			}, {
+   				title: 'Yesterday',
+   				items: itemsYes
+   			}, {
+   				title: 'Today',
+               items: itemsTod
+   			}]
+   		});
+   
+   		dailyProjects.show();
+   }
+}
