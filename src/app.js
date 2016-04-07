@@ -1,12 +1,7 @@
-/**
- * Welcome to Pebble.js!
- *
- * This is where you write your app.
- */
-
 var UI = require('ui');
 var Vector2 = require('vector2');
 var ajax = require('ajax');
+var items = [];
 
 var main = new UI.Card({
 	title: 'Pebble.js',
@@ -15,14 +10,12 @@ var main = new UI.Card({
 	body: 'Press any button.'
 });
 
-//main.show();
-
 function timeConverter(UNIX_timestamp){
 	var a = new Date(UNIX_timestamp*1000);
 	//var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 	//var year = a.getFullYear();
 	//var month = months[a.getMonth()];
-	//var date = a.getDate();
+	var date = a.getDate();
 	var hour = a.getHours();
 	var min = a.getMinutes();
 	var sec = a.getSeconds();
@@ -44,23 +37,95 @@ var toHHMMSS = function (date) {
 };
 
 var today = new Date();
-var today = [today.getMonth()+1,today.getDate(),today.getFullYear()].join('/');
+var today1 = [today.getMonth()+1,today.getDate(),today.getFullYear()].join('/');
+var yesterday = [today.getMonth()+1,today.getDate()-1,today.getFullYear()].join('/');
+var twoDaysAgo = [today.getMonth()+1,today.getDate()-2,today.getFullYear()].join('/');
 
-var api_key='API KEY';
+var api_key='4a70eed4-e615-4f98-97d4-db2bc3b8691b';
 
 ajax(
 	{
-		url: 'https://wakatime.com/api/v1/users/current/durations?date='+today+'&api_key='+api_key,
+		url: 'https://wakatime.com/api/v1/users/current/durations?date='+twoDaysAgo+'&api_key='+api_key,
 		type: 'json'
 	}, 
 
 	function(data){
-		var items = [];
 
 		console.log("data", data.data, data.data.length);
+		console.log("date: ", twoDaysAgo);
 
 		if (data.data.length == 0) {
-			console.log("No data for date "+today);
+			console.log("No data for date "+twoDaysAgo);
+			items.push({
+				title: 'No time logged',
+				subtitle: 'Get to work!'
+			});
+		} else {
+			for (var i = 0; i<data.data.length; i++) {
+				items.push({ 
+					title: data.data[i].project, 
+					subtitle: timeConverter(data.data[i].time) + ' for '+toHHMMSS(data.data[i].duration.toString())
+				});
+			}
+		}
+
+		console.log("items", items);
+
+	},
+	function(error) {
+		// Failure!
+		console.log('Failed fetching WakaTime data: ' + error);
+	}
+);
+
+ajax(
+	{
+		url: 'https://wakatime.com/api/v1/users/current/durations?date='+yesterday+'&api_key='+api_key,
+		type: 'json'
+	}, 
+
+	function(data){
+		
+		console.log("data", data.data, data.data.length);
+		console.log("date: ", yesterday);
+
+		if (data.data.length == 0) {
+			console.log("No data for date "+yesterday);
+			items.push({
+				title: 'No time logged',
+				subtitle: 'Get to work!'
+			});
+		} else {
+			for (var i = 0; i<data.data.length; i++) {
+				items.push({ 
+					title: data.data[i].project, 
+					subtitle: timeConverter(data.data[i].time) + ' for '+toHHMMSS(data.data[i].duration.toString())
+				});
+			}
+		}
+
+		console.log("items", items);
+
+	},
+	function(error) {
+		// Failure!
+		console.log('Failed fetching WakaTime data: ' + error);
+	}
+);
+
+ajax(
+	{
+		url: 'https://wakatime.com/api/v1/users/current/durations?date='+today1+'&api_key='+api_key,
+		type: 'json'
+	}, 
+
+	function(data){
+		
+		console.log("data", data.data, data.data.length);
+		console.log("date: ", today1);
+
+		if (data.data.length == 0) {
+			console.log("No data for date "+today1);
 			items.push({
 				title: 'No time logged',
 				subtitle: 'Get to work!'
@@ -111,6 +176,8 @@ main.on('click', 'up', function(e) {
 	menu.show();
 });
 
+
+/**
 main.on('click', 'select', function(e) {
 	var wind = new UI.Window();
 	var textfield = new UI.Text({
@@ -131,3 +198,4 @@ main.on('click', 'down', function(e) {
 	card.body('The simplest window type in Pebble.js.');
 	card.show();
 });
+**/
